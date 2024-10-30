@@ -15,6 +15,10 @@ This is the backend for our project, built with Symfony.
    - enter to `search` directory
 2. **Install dependencies**:
    - Run CLI: `composer install`
+3. **Install dependencies**:
+   - Run CLI: `npm install`
+4. **Compile React For Dev**:
+   - Run CLI: `npm run dev`
 
     
 
