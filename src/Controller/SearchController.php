@@ -30,8 +30,10 @@ class SearchController extends AbstractController
 
         return new JsonResponse([
             'query' => $query,
-            'google_results' => $results['google_results'],
-            'bing_results' => $results['bing_results']
+            'results' => [
+                'google' => $results['google_results'],
+                'bing' => $results['bing_results']
+            ]
         ]);
     }
 }
