@@ -6,15 +6,18 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Psr\Log\LoggerInterface;
 use App\Service\SearchService;
 
 class SearchController extends AbstractController
 {
     private $searchService;
+    private $logger;
 
-    public function __construct(SearchService $searchService)
+    public function __construct(SearchService $searchService, LoggerInterface $logger)
     {
         $this->searchService = $searchService;
+        $this->logger = $logger;
     }
 
     public function search(Request $request): JsonResponse
@@ -27,6 +30,16 @@ class SearchController extends AbstractController
         }
 
         $results = $this->searchService->search($query);
+
+        if (empty($results)) {
+            $this->logger->error('No results.', ['query' => $query]);
+        }
+        if (empty($results['google_results'])) {
+            $this->logger->error('No results from Google search engine.', ['query' => $query]);
+        }
+        if (empty($results['bing_results'])) {
+            $this->logger->error('No results from Bing search engine.', ['query' => $query]);
+        }
 
         return new JsonResponse([
             'query' => $query,
