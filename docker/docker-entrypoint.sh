@@ -1,6 +1,13 @@
 #!/bin/bash
 set -e
 
-# Run any custom commands here
+# Run Composer install
+composer install
+
+# Run npm install
+npm install
+
+# Build assets
+npm run dev
 
 exec "$@"

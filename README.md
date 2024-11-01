@@ -13,12 +13,10 @@ This is the backend for our project, built with Symfony.
 1. **Clone the repository**:
    - Run CLI: `git clone https://github.com/robermani/search.git`
    - enter to `search` directory
-2. **Install dependencies**:
-   - Run CLI: `composer install`
-3. **Install dependencies**:
-   - Run CLI: `npm install`
-4. **Compile React For Dev**:
-   - Run CLI: `npm run dev`
+2. **Start Docker**:
+   - Run CLI: `docker-compose up --build`
+3. **Use:**:
+   - Go to `http://localhost:8080` in your browser
 
     
 

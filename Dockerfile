@@ -7,7 +7,9 @@ RUN apt-get update && apt-get install -y \
     libicu-dev \
     libpq-dev \
     libzip-dev \
-    zip
+    zip \
+    nodejs \
+    npm
 
 # Install PHP extensions
 RUN docker-php-ext-install intl pdo pdo_mysql zip
@@ -21,5 +23,11 @@ WORKDIR /var/www/search
 # Copy existing application directory contents
 COPY . /var/www/search
 
-# Install Symfony dependencies
-RUN composer install
+# Copy entrypoint script
+COPY docker/docker-entrypoint.sh /usr/local/bin/
+
+# Set entrypoint
+ENTRYPOINT ["docker-entrypoint.sh"]
+
+# Default command
+CMD ["php-fpm"]
