@@ -24,7 +24,10 @@ WORKDIR /var/www/search
 COPY . /var/www/search
 
 # Copy entrypoint script
-COPY docker/docker-entrypoint.sh /usr/local/bin/
+COPY docker/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+
+# Ensure the entrypoint script is executable
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # Set entrypoint
 ENTRYPOINT ["docker-entrypoint.sh"]
