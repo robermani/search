@@ -23,26 +23,27 @@ const App = () => {
   const [loading, setLoading] = useState(false); // Add loading state
 
   const handleSearch = async (query) => {
-
-    setLoading(true); // Set loading to true when search starts
-    if (USE_DEMO_DATA) {
-      const combinedResults = [...demoResults.google, ...demoResults.bing];
-      setResults(combinedResults);
-      setLoading(false); // Set loading to false when search ends
-    } else {
-      try {
-        setHasSearched(true);
-        const response = await fetch(`/api/search?q=${query}`);
-        const data = await response.json();
-        const combinedResults = [
-          ...data.results.google,
-          ...data.results.bing,
-        ];
+    if (query) {
+      setLoading(true); // Set loading to true when search starts
+      if (USE_DEMO_DATA) {
+        const combinedResults = [...demoResults.google, ...demoResults.bing];
         setResults(combinedResults);
-      } catch (error) {
-        console.error('Error fetching search results', error);
-      } finally {
         setLoading(false); // Set loading to false when search ends
+      } else {
+        try {
+          setHasSearched(true);
+          const response = await fetch(`/api/search?q=${query}`);
+          const data = await response.json();
+          const combinedResults = [
+            ...data.results.google,
+            ...data.results.bing,
+          ];
+          setResults(combinedResults);
+        } catch (error) {
+          console.error('Error fetching search results', error);
+        } finally {
+          setLoading(false); // Set loading to false when search ends
+        }
       }
     }
   };
