@@ -13,6 +13,7 @@ class SearchController extends AbstractController
 {
     private $searchService;
     private $logger;
+    const RESULTS_AMOUNT = 5;
 
     public function __construct(SearchService $searchService, LoggerInterface $logger)
     {
@@ -23,13 +24,14 @@ class SearchController extends AbstractController
     public function search(Request $request): JsonResponse
     {
         $query = $request->query->get('q');
+        $chunk = $request->query->get('chunk') ?? 1;
 
         // Validate the query parameter
         if (empty($query) || !is_string($query)) {
             return new JsonResponse(['error' => 'Invalid query parameter.'], JsonResponse::HTTP_BAD_REQUEST);
         }
 
-        $results = $this->searchService->search($query);
+        $results = $this->searchService->search($query, self::RESULTS_AMOUNT, $chunk);
 
         if (empty($results)) {
             $this->logger->error('No results.', ['query' => $query]);
