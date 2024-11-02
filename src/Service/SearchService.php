@@ -12,7 +12,7 @@ class SearchService
     private $bingSearchEngine;
     private $cache;
 
-    public function __construct(GoogleSearchEngine $googleSearchEngine, BingSearchEngine $bingSearchEngine, CacheInterface $cache)
+    public function __construct(GoogleSearchEngine $googleSearchEngine, BingSearchEngine $bingSearchEngine, CacheInterface $cache = null)
     {
         $this->googleSearchEngine = $googleSearchEngine;
         $this->bingSearchEngine = $bingSearchEngine;
@@ -22,9 +22,19 @@ class SearchService
     public function search(string $query): array
     {
 
-        return $this->cache->get('search_results_' . md5($query), function (ItemInterface $item) use ($query) {
-            $item->expiresAfter($_ENV['CACHE_EXPIRATION_TIME'] ?? 3600);
-
+        if ($this->cache) {
+            return $this->cache->get('search_results_' . md5($query), function (ItemInterface $item) use ($query) {
+                $item->expiresAfter($_ENV['CACHE_EXPIRATION_TIME'] ?? 3600);
+    
+                $googleResults = $this->googleSearchEngine->search($query);
+                $bingResults = $this->bingSearchEngine->search($query);
+    
+                return [
+                    'google_results' => $googleResults,
+                    'bing_results' => $bingResults
+                ];
+            });
+        } else {
             $googleResults = $this->googleSearchEngine->search($query);
             $bingResults = $this->bingSearchEngine->search($query);
 
@@ -32,7 +42,8 @@ class SearchService
                 'google_results' => $googleResults,
                 'bing_results' => $bingResults
             ];
-        });
+        }
+        
     }
 }
 
