@@ -8,7 +8,7 @@ use Symfony\Component\DomCrawler\Crawler;
 
 class BingSearchEngine
 {
-    public function search(string $query): array
+    public function search(string $query, int $resultsAmount = 1, int $chunk = 1): array
     {
         $url = 'https://www.bing.com/search?q=' . urlencode($query);
         $client = new Client();
@@ -21,19 +21,19 @@ class BingSearchEngine
         $html = $response->getBody()->getContents();
         $crawler = new Crawler($html);
         $results = [];
+        $crawler->filter('li.b_algo')->each(function (Crawler $node, $i) use (&$results, $resultsAmount, $chunk) {
+            $start = ($chunk - 1) * $resultsAmount;
+            $end = $chunk * $resultsAmount;
+            if ($i >= $start && $i < $end) {
+                $title = $node->filter('h2')->text('');
+                $link = $node->filter('a')->attr('href');
 
-        $crawler->filter('li.b_algo')->each(function (Crawler $node, $i) use (&$results) {
-            if ($i >= 5) return;
-            $title = $node->filter('h2')->text('');
-            $link = $node->filter('a')->attr('href');
-            $description = $node->filter('p')->text('');
-
-            if ($title && $link) {
-                $results[] = [
-                    'title' => $title,
-                    'link' => $link,
-                    'description' => $description
-                ];
+                if ($title && $link) {
+                    $results[] = [
+                        'title' => $title,
+                        'link' => $link,
+                    ];
+                }
             }
         });
 

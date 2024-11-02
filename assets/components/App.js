@@ -20,19 +20,23 @@ const App = () => {
   const [results, setResults] = useState([]);
   const [displayMode, setDisplayMode] = useState('list');
   const [hasSearched, setHasSearched] = useState(false);
-  const [loading, setLoading] = useState(false); // Add loading state
+  const [loading, setLoading] = useState(false);
+  const [chunk, setChunk] = useState(1); // Add chunk state
+  const [query, setQuery] = useState(''); // Add query state
 
-  const handleSearch = async (query) => {
-    if (query) {
-      setLoading(true); // Set loading to true when search starts
+  const handleSearch = async (searchQuery) => {
+    if (searchQuery) {
+      setLoading(true);
+      setQuery(searchQuery); // Set the query state
+      setChunk(1); // Reset chunk to 1 on new search
       if (USE_DEMO_DATA) {
         const combinedResults = [...demoResults.google, ...demoResults.bing];
         setResults(combinedResults);
-        setLoading(false); // Set loading to false when search ends
+        setLoading(false);
       } else {
         try {
           setHasSearched(true);
-          const response = await fetch(`/api/search?q=${query}`);
+          const response = await fetch(`/api/search?q=${searchQuery}&chunk=1`);
           const data = await response.json();
           const combinedResults = [
             ...data.results.google,
@@ -42,9 +46,29 @@ const App = () => {
         } catch (error) {
           console.error('Error fetching search results', error);
         } finally {
-          setLoading(false); // Set loading to false when search ends
+          setLoading(false);
         }
       }
+    }
+  };
+
+  const handleLoadMore = async () => {
+    setLoading(true);
+    const nextChunk = chunk + 1;
+    setChunk(nextChunk);
+    try {
+      const response = await fetch(`/api/search?q=${query}&chunk=${nextChunk}`);
+      const data = await response.json();
+      const combinedResults = [
+        ...results,
+        ...data.results.google,
+        ...data.results.bing,
+      ];
+      setResults(combinedResults);
+    } catch (error) {
+      console.error('Error fetching more search results', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -55,18 +79,18 @@ const App = () => {
   return (
       <div className="container">
         <h1 className="my-4">Search Page</h1>
-        <SearchForm onSearch={handleSearch} loading={loading} /> {/* Pass loading state */}
-        {
-            loading &&
-          <div className="spinner-border spinner" role="status">
-            <span className="sr-only">Loading...</span>
-          </div>
-        } {/* Show loader */}
+        <SearchForm onSearch={handleSearch} loading={loading} />
+        {loading && (
+            <div className="spinner-border spinner" role="status">
+              <span className="sr-only">Loading...</span>
+            </div>
+        )}
         {hasSearched && !loading && (
             <SearchResults
                 results={results}
                 displayMode={displayMode}
                 onDisplayModeChange={handleDisplayModeChange}
+                onLoadMore={handleLoadMore} // Pass handleLoadMore to SearchResults
             />
         )}
       </div>

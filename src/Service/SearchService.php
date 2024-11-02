@@ -8,9 +8,9 @@ use Symfony\Contracts\Cache\ItemInterface;
 
 class SearchService
 {
-    private $googleSearchEngine;
-    private $bingSearchEngine;
-    private $cache;
+    private BingSearchEngine $bingSearchEngine;
+    private GoogleSearchEngine $googleSearchEngine;
+    private ?CacheInterface $cache;
 
     public function __construct(GoogleSearchEngine $googleSearchEngine, BingSearchEngine $bingSearchEngine, CacheInterface $cache = null)
     {
@@ -19,31 +19,27 @@ class SearchService
         $this->cache = $cache;
     }
 
-    public function search(string $query): array
+    public function search(string $query, int $resultsAmount, int $chunk): array
     {
-
-        if ($this->cache) {
-            return $this->cache->get('search_results_' . md5($query), function (ItemInterface $item) use ($query) {
+        if ($this->cache && $chunk == 1) {
+            return $this->cache->get('search_results_' . md5($query), function (ItemInterface $item) use ($query, $resultsAmount, $chunk) {
                 $item->expiresAfter($_ENV['CACHE_EXPIRATION_TIME'] ?? 3600);
-    
-                $googleResults = $this->googleSearchEngine->search($query);
-                $bingResults = $this->bingSearchEngine->search($query);
-    
+                $googleResults = $this->googleSearchEngine->search($query, $resultsAmount, $chunk);
+                $bingResults = $this->bingSearchEngine->search($query, $resultsAmount, $chunk);
+
                 return [
                     'google_results' => $googleResults,
                     'bing_results' => $bingResults
                 ];
             });
         } else {
-            $googleResults = $this->googleSearchEngine->search($query);
-            $bingResults = $this->bingSearchEngine->search($query);
+            $googleResults = $this->googleSearchEngine->search($query, $resultsAmount, $chunk);
+            $bingResults = $this->bingSearchEngine->search($query, $resultsAmount, $chunk);
 
             return [
                 'google_results' => $googleResults,
                 'bing_results' => $bingResults
             ];
         }
-        
     }
 }
-
