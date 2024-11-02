@@ -20,6 +20,9 @@ This is the backend for our project, built with Symfony.
    - Run CLI: `docker-compose up --build`
 4. **Use:**:
    - Go to `http://localhost:8080` in your browser
+5. **Run Test:**:
+   - Run CLI: `php bin/phpunit`
+
 
     
 
