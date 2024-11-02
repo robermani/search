@@ -13,12 +13,12 @@ class SearchService
     private GoogleSearchEngine $googleSearchEngine;
     private BingSearchEngine $bingSearchEngine;
     private ?CacheInterface $cache;
-    private EntityManagerInterface $entityManager;
+    private $entityManager;
 
     public function __construct(
         GoogleSearchEngine $googleSearchEngine,
         BingSearchEngine $bingSearchEngine,
-        EntityManagerInterface $entityManager,
+        EntityManagerInterface $entityManager = null,
         CacheInterface $cache = null
     ) {
         $this->googleSearchEngine = $googleSearchEngine;
@@ -45,8 +45,10 @@ class SearchService
         $bingResults = $this->bingSearchEngine->search($query, $resultsAmount, $chunk);
 
         // Save each result to the database
-        $this->saveResults($googleResults, 'Google');
-        $this->saveResults($bingResults, 'Bing');
+        if (!is_null($this->entityManager)) {
+            $this->saveResults($googleResults, 'Google');
+            $this->saveResults($bingResults, 'Bing');
+        }
 
         return [
             'google_results' => $googleResults,
