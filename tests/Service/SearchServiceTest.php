@@ -22,9 +22,9 @@ class SearchServiceTest extends TestCase
         ];
         $googleSearchEngine = new GoogleSearchEngine();
         $bingSearchEngine = new BingSearchEngine();
-        $service = new SearchService($googleSearchEngine, $bingSearchEngine);
+        $service = new SearchService($googleSearchEngine, $bingSearchEngine, null);
         $query = 'ewave';
-        $results = $service->search($query);
+        $results = $service->search($query, 5, 1);
         if (!empty($results['google_results']) && is_array($results['google_results'])) {
             $actual_result['google_results_amount'] = count($results['google_results']);
         }

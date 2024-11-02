@@ -19,6 +19,7 @@ This is the backend for our project, built with Symfony.
 3. **Run On Docker**:
    - Run CLI: `docker-compose up --build`
 4. **Use:**:
+   - Wait for `Running webpack ... DONE  Compiled successfully`
    - Go to `http://localhost:8080` in your browser
 5. **Run Test:**:
    - Run CLI: `php bin/phpunit`
