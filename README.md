@@ -4,9 +4,7 @@ This is the backend for our project, built with Symfony.
 
 ## Requirements
 
-- PHP 8.2
-- Composer
-- MySQL
+- Docker 
 
 ## Setup
 
